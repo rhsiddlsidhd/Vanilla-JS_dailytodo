@@ -383,16 +383,14 @@ main {
   border-right: 1px solid #fffbf5;
 }
 
-.task-items > .delete:before {
-  content: "\1F5D1";
-
-  font-size: 2rem;
+.task-items > .delete > button {
   font-weight: bold;
   cursor: pointer;
+  border: none;
 }
 
-.task-items > .delete:hover::before {
-  font-size: 3rem;
+.task-items > .delete > button:hover {
+  font-size: 1rem;
   font-weight: bold;
   color: #6643db;
   cursor: pointer;
