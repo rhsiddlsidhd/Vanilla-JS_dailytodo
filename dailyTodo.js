@@ -11,7 +11,9 @@ const pointColor = "#6643DB";
 const taskInput = document.getElementById("taskInput");
 const taskInputBtn = document.getElementById("taskInputBtn");
 const totaltaskBtn = document.getElementById("totaltask");
-const taskInputList = [];
+//전체리스트
+let taskInputList = [];
+let selectedIds = [];
 
 //전체 또는 개인 체크박스
 const totalCheckBtn = () => {
@@ -83,7 +85,7 @@ const render = () => {
     <button>수정</button>
   </div>
   <div class="delete">
-    <div></div>
+    <button onclick="singlePostDelete('${taskInputList[i].id}')">삭제</button>
   </div>
 </div>`;
   }
@@ -95,4 +97,67 @@ const generalRandomId = () => {
   return "_" + Math.random().toString(36).substr(2, 9);
 };
 
-//********************************************* */
+/**
+ * 단일 삭제
+ */
+function singlePostDelete(id) {
+  const newTaskInputList = taskInputList.filter((it) => {
+    return it.id !== id;
+  });
+  taskInputList = newTaskInputList;
+  render();
+  //전체체크 업데이트
+  if (totaltaskBtn) {
+    totaltaskBtn.checked = false;
+  }
+}
+
+/**
+ * 선택 삭제
+ * 1. 선택된 아이템(id)들을 전부 배열로 받아둔다
+ *    => 전체 리스트에서 반복문을 통해 새로운 배열을 생성
+ *    => 조건은 isComplete = true 인 Id값만 가져오기
+ * 2. 해당 배열을 제외한 나머지 id값들로 list를 새롭게 재선언한다
+ * 3. 새롭게 선언한것으로 render한다
+ */
+
+function handleMultiDelete() {
+  if (taskInputList.length <= 0) {
+    alert("삭제할 항목이 없습니다.");
+    return;
+  }
+
+  selectedIds = taskInputList.filter((it) => it.isComplete).map((it) => it.id);
+  console.log("선택", selectedIds);
+  const updatedTaskInputList = taskInputList.filter(
+    (task) => !selectedIds.includes(task.id)
+  );
+  taskInputList = updatedTaskInputList;
+  console.log("최종", taskInputList);
+  render();
+
+  //전체체크 업데이트
+  if (totaltaskBtn) {
+    totaltaskBtn.checked = false;
+  }
+}
+/**
+ * 전체 삭제
+ */
+
+function totalDelete() {
+  if (taskInputList.length <= 0) {
+    alert("삭제할 항목이 없습니다.");
+    return;
+  }
+  const confirmed = window.confirm("정말 다 삭제하시겠습니까?");
+  if (confirmed) {
+    taskInputList = [];
+    render();
+
+    //전체체크 업데이트
+    if (totaltaskBtn) {
+      totaltaskBtn.checked = false;
+    }
+  }
+}

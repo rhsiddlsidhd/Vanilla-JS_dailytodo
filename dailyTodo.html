@@ -43,8 +43,12 @@
               <label for="totaltask">
                 <input type="checkbox" id="totaltask" name="checkboxGroup" />
               </label>
-              <button>전체삭제</button>
-              <button>선택삭제</button>
+              <button class="total-delete" onclick="totalDelete()">
+                전체삭제
+              </button>
+              <button class="multi-delete" onclick="handleMultiDelete()">
+                선택삭제
+              </button>
             </div>
             <div class="task-items-box">
               <!-- 추가 -->
