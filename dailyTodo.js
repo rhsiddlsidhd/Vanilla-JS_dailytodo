@@ -1,13 +1,3 @@
-// color
-const whiteColor = "#FFFBF5";
-const primaryColor = "#C3ACD0";
-const secondColor = "#F7EFE5";
-const pointColor = "#6643DB";
-
-/**
- *
- */
-
 const taskInput = document.getElementById("taskInput");
 const taskInputBtn = document.getElementById("taskInputBtn");
 const totaltaskBtn = document.getElementById("totaltask");
@@ -79,13 +69,17 @@ const render = () => {
     /></label>
   </div>
   <div class="task">
-    <div>${taskInputList[i].content}</div>
+    <div id="readonly-${taskInputList[i].id}">${taskInputList[i].content}</div>
+    <label for="edit-${taskInputList[i].id}">
+    <input id="edit-${taskInputList[i].id}" type="text" value="${taskInputList[i].content}"/></label>
   </div>
   <div class="update">
-    <button>수정</button>
+    <button id="edit-Btn-${taskInputList[i].id}" onclick="toggleEditBtn('${taskInputList[i].id}')">수정</button>
+    <button id="editComplete-Btn-${taskInputList[i].id}" style="display:none" onclick=editcomplete('${taskInputList[i].id}')>수정완료</button>
   </div>
   <div class="delete">
-    <button onclick="singlePostDelete('${taskInputList[i].id}')">삭제</button>
+    <button id=delete-Btn-${taskInputList[i].id} onclick="singlePostDelete('${taskInputList[i].id}')">삭제</button>
+    <button id="editCancel-Btn-${taskInputList[i].id}" style="display:none" onclick=editCancel('${taskInputList[i].id}')>수정취소</button>
   </div>
 </div>`;
   }
@@ -122,25 +116,35 @@ function singlePostDelete(id) {
  */
 
 function handleMultiDelete() {
-  if (taskInputList.length <= 0) {
-    alert("삭제할 항목이 없습니다.");
-    return;
-  }
+  const confirm = window.confirm("선택된 항목을 삭제하시겠습니까?");
 
-  selectedIds = taskInputList.filter((it) => it.isComplete).map((it) => it.id);
-  console.log("선택", selectedIds);
-  const updatedTaskInputList = taskInputList.filter(
-    (task) => !selectedIds.includes(task.id)
-  );
-  taskInputList = updatedTaskInputList;
-  console.log("최종", taskInputList);
-  render();
+  if (confirm) {
+    selectedIds = taskInputList
+      .filter((it) => it.isComplete)
+      .map((it) => it.id);
 
-  //전체체크 업데이트
-  if (totaltaskBtn) {
-    totaltaskBtn.checked = false;
+    const selectedItems = selectedIds.length > 0;
+
+    if (!selectedItems) {
+      alert("선택된 항목이 없습니다.");
+      return;
+    }
+
+    const updatedTaskInputList = taskInputList.filter(
+      (it) => !selectedIds.includes(it.id)
+    );
+
+    taskInputList = updatedTaskInputList;
+
+    render();
+
+    //전체체크 업데이트
+    if (totaltaskBtn) {
+      totaltaskBtn.checked = false;
+    }
   }
 }
+
 /**
  * 전체 삭제
  */
@@ -160,4 +164,92 @@ function totalDelete() {
       totaltaskBtn.checked = false;
     }
   }
+}
+
+/**
+ * 수정버튼
+ * taskInputList[i].content 부분을 edit input type="text" 로 전환
+ *
+ */
+
+function toggleEditBtn(id) {
+  //text
+  let readonlyInputStyle = document.getElementById(`readonly-${id}`);
+  /**
+   * 직접적으로 숨겨야 하는 Id와 display:flex를 적용시켜야 하는 input이 아닌 label을 가져와서 flex를 적용
+   * [] 속성 선택자
+   */
+  let editLabel = document.querySelector(`label[for="edit-${id}"]`);
+
+  readonlyInputStyle.style.display = "none";
+  editLabel.style.display = "flex";
+
+  const editBtn = document.getElementById(`edit-Btn-${id}`);
+  const editCompleteBtn = document.getElementById(`editComplete-Btn-${id}`);
+
+  //수정완료 버튼
+  editBtn.style.display = "none";
+  editCompleteBtn.style.display = "block";
+
+  const editCancelBtn = document.getElementById(`editCancel-Btn-${id}`);
+  const deleteBtn = document.getElementById(`delete-Btn-${id}`);
+
+  //수정취소 버튼
+  deleteBtn.style.display = "none";
+  editCancelBtn.style.display = "block";
+
+  /**
+   * 수정버튼 클릭시 input에 value 값으로 현재 Id.content 표시
+   * 수정완료버튼 시 객체 content 를 업그레이드 render
+   * 수정취소 시 객체 content 를 기존 그대로 render
+   */
+}
+
+//수정완료버튼
+function editcomplete(id) {
+  const readonlyInputStyle = document.getElementById(`readonly-${id}`);
+  const editLabel = document.querySelector(`label[for="edit-${id}"]`);
+  const editBtn = document.getElementById(`edit-Btn-${id}`);
+  const editCompleteBtn = document.getElementById(`editComplete-Btn-${id}`);
+  const editCancelBtn = document.getElementById(`editCancel-Btn-${id}`);
+  const deleteBtn = document.getElementById(`delete-Btn-${id}`);
+
+  const task = document.getElementById(`edit-${id}`);
+  updatedValue = task.value;
+  const taskUpdate = taskInputList.find((it) => it.id === id);
+  if (taskUpdate) {
+    taskUpdate.content = updatedValue;
+  }
+
+  //input 초기화
+  readonlyInputStyle.style.display = "flex";
+  editLabel.style.display = "none";
+  //버튼초기화
+  editBtn.style.display = "block";
+  editCompleteBtn.style.display = "none";
+  editCancelBtn.style.display = "none";
+  deleteBtn.style.display = "block";
+
+  render();
+}
+
+//수정취소버튼
+function editCancel(id) {
+  const readonlyInputStyle = document.getElementById(`readonly-${id}`);
+  const editLabel = document.querySelector(`label[for="edit-${id}"]`);
+  const editBtn = document.getElementById(`edit-Btn-${id}`);
+  const editCompleteBtn = document.getElementById(`editComplete-Btn-${id}`);
+  const editCancelBtn = document.getElementById(`editCancel-Btn-${id}`);
+  const deleteBtn = document.getElementById(`delete-Btn-${id}`);
+
+  render();
+
+  //input 초기화
+  readonlyInputStyle.style.display = "flex";
+  editLabel.style.display = "none";
+  //버튼초기화
+  editBtn.style.display = "block";
+  editCompleteBtn.style.display = "none";
+  editCancelBtn.style.display = "none";
+  deleteBtn.style.display = "block";
 }
