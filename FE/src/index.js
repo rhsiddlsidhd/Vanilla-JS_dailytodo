@@ -213,8 +213,8 @@ function editcomplete(id) {
   const editCompleteBtn = document.getElementById(`editComplete-Btn-${id}`);
   const editCancelBtn = document.getElementById(`editCancel-Btn-${id}`);
   const deleteBtn = document.getElementById(`delete-Btn-${id}`);
-
   const task = document.getElementById(`edit-${id}`);
+
   updatedValue = task.value;
   const taskUpdate = taskInputList.find((it) => it.id === id);
   if (taskUpdate) {
